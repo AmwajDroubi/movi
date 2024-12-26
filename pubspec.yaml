@@ -1,0 +1,60 @@
+name: movi
+description: "A new Flutter project."
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+
+  
+  cupertino_icons: ^1.0.8
+  equatable: ^2.0.7
+  carousel_slider: ^5.0.0
+  flutter_bloc: ^8.1.6
+  shared_preferences: ^2.3.3
+  url_launcher: ^6.3.1
+  youtube_player_flutter: ^9.1.1
+  flutter_inappwebview: ^6.1.5
+  favorite_button: ^0.0.4
+
+
+  cached_network_image: ^3.4.1
+  http: ^1.2.2
+  dio: ^5.7.0 
+  #dio مسؤولة عن مواقع الانترنت
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^4.0.0
+
+
+flutter:
+
+
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
+
+ 
+  fonts:
+    - family: Trirong
+      fonts:
+        - asset: assets\fonts\Trirong-BlackItalic.ttf
+        - asset: assets\fonts\PlayfairDisplay-VariableFont_wght.ttf
+       
+
