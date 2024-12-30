@@ -18,26 +18,33 @@ class _MovieGenreScreenState extends State<MovieGenreScreen> {
     10749: "الرومنسي",
     35: "الكوميديا",
     18: "الدراما",
+    80: "الجريمة",
+    27: "الرعب",
+    878: "الخيال العلمي",
+    10752: "الحروب",
   };
 
   @override
   void initState() {
     super.initState();
-    fetchMovies();
+    fetchMovies(); // تحميل الأفلام عند بدء الصفحة
   }
 
+  // دالة لتحميل الأفلام بناءً على النوع المحدد
   Future<void> fetchMovies() async {
     final url = Uri.parse(
-        '$apiUrl?api_key=$apiKey&language=ar&with_genres=$selectedGenre&page=1');
+      '$apiUrl?api_key=$apiKey&language=ar&with_genres=$selectedGenre&page=1',
+    ); // هنا تم إضافة معرّف النوع (selectedGenre)
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      print("افلام النوع ${genres[selectedGenre]}: ${data['results']}"); // لمراجعة البيانات
       setState(() {
-        movies = data['results'];
+        movies = data['results']; // تحديث قائمة الأفلام
       });
     } else {
-      print('Failed to load movies: ${response.statusCode}');
+      print('فشل في تحميل الأفلام: ${response.statusCode}');
     }
   }
 
@@ -45,7 +52,6 @@ class _MovieGenreScreenState extends State<MovieGenreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      // appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SafeArea(
@@ -54,7 +60,9 @@ class _MovieGenreScreenState extends State<MovieGenreScreen> {
               Row(
                 children: [
                   IconButton(
-                      onPressed: Navigator.of(context).pop,
+                      onPressed: () {
+                        Navigator.of(context).pop(); // العودة للصفحة السابقة
+                      },
                       icon: Icon(Icons.arrow_back)),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
@@ -78,7 +86,7 @@ class _MovieGenreScreenState extends State<MovieGenreScreen> {
                                 setState(() {
                                   selectedGenre = value!;
                                 });
-                                fetchMovies();
+                                fetchMovies(); // تحميل الأفلام بناءً على النوع الجديد
                               },
                             ),
                             Spacer(),
@@ -99,7 +107,8 @@ class _MovieGenreScreenState extends State<MovieGenreScreen> {
               ),
               Expanded(
                 child: movies.isEmpty
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: CircularProgressIndicator()) // تحميل الأفلام
                     : ListView.builder(
                         itemCount: movies.length,
                         itemBuilder: (context, index) {

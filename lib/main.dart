@@ -29,6 +29,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/home_cubit/home_movi_cubit.dart';
 import 'package:movi/block/sldider_cubit/movi_slider_cubit.dart';
 import 'package:movi/model/top_headline_model.dart';
+import 'package:movi/views/first.dart';
+import 'package:movi/views/introduction.dart';
 import 'package:movi/views/popular_movies.dart.dart';
 import 'package:movi/views/home_movi.dart';
 import 'package:movi/views/test.dart';
@@ -63,6 +65,7 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: AllPopular());
+    return MaterialApp(
+        debugShowCheckedModeBanner: false, home: IntroductionPage());
   }
 }

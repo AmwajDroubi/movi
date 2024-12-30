@@ -38,7 +38,6 @@ class TopRatedMovies extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 9),
         BlocBuilder<HomeCubit, HomeState>(
           bloc: homeCubit,
           buildWhen: (previous, current) =>
@@ -49,7 +48,7 @@ class TopRatedMovies extends StatelessWidget {
             if (state is HomeListLoaded) {
               final movieList = state.movies;
               return SizedBox(
-                height: 300,
+                height: 170,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: movieList.length,
@@ -58,14 +57,13 @@ class TopRatedMovies extends StatelessWidget {
                     return Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       child: Container(
-                        // width: 110,
                         child: Column(
                           children: [
                             movieItem["poster_path"] != null
                                 ? Image.network(
                                     'https://image.tmdb.org/t/p/w500${movieItem['poster_path']}',
                                     width: 120,
-                                    //  height: 140,
+                                    height: 130,
                                     fit: BoxFit.cover,
                                   )
                                 : Icon(Icons.movie),
@@ -97,9 +95,9 @@ class TopRatedMovies extends StatelessWidget {
             }
           },
         ),
-        SizedBox(
-          height: 20,
-        ),
+        // SizedBox(
+        //   height: 20,
+        // ),
       ],
     );
   }

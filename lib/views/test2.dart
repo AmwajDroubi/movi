@@ -1,199 +1,380 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movi/block/home_cubit/home_movi_cubit.dart';
-import 'package:movi/block/home_cubit/home_movi_state.dart';
-import 'package:movi/model/top_headline_model.dart';
-import 'package:movi/widget/details.dart';
+// import 'package:flutter/material.dart';
+// import 'package:movi/views/category_details.dart';
 
-class AllPopular extends StatefulWidget {
-  // final List<Movie> movieItem;
+// class LanguageGiner extends StatefulWidget {
+//   const LanguageGiner({super.key});
 
-  const AllPopular({super.key});
+//   @override
+//   _LanguageGinerState createState() => _LanguageGinerState();
+// }
 
-  @override
-  State<AllPopular> createState() => _AllPopularState();
-}
+// class _LanguageGinerState extends State<LanguageGiner> {
+//   String? selectedLanguage; // لا توجد قيمة بدائية
+//   int? selectedGenre; // لا توجد قيمة بدائية
 
-class _AllPopularState extends State<AllPopular> {
-  @override
-  Widget build(BuildContext context) {
-    final homeCubit = BlocProvider.of<HomeCubit>(context);
+//   Map<String, String> languages = {
+//     'ar': "العربية",
+//     'en': "الإنجليزية",
+//     'fr': "الفرنسية",
+//   };
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "All Popular movies",
-          style: TextStyle(
-              fontSize: 25,
-              fontFamily: "PlayfairDisplay",
-              color: Colors.blue[700]),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-            onPressed: Navigator.of(context).pop, icon: Icon(Icons.arrow_back)),
-      ),
-      body: BlocBuilder<HomeCubit, HomeState>(
-        bloc: homeCubit,
-        buildWhen: (previous, current) =>
-            current is HomeListLoaded ||
-            current is HomeListLoading ||
-            current is HomeListError,
-        builder: (context, state) {
-          if (state is HomeListLoaded) {
-            final movi = state.movies;
-            return ListView.builder(
-              itemCount: movi.length,
-              itemBuilder: (context, index) {
-                final moviItem = movi[index];
-                return Padding(
-                  padding: const EdgeInsets.all(4.5),
-                  child: InkWell(
-                    onTap: () {
-                      // الانتقال إلى صفحة التفاصيل وتمرير المعطيات
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MovieDetailsPage(
-                          movie: moviItem, // تمرير بيانات الفيلم
-                        ),
-                      ));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(children: [
-                              Expanded(
-                                flex: 1,
-                                child: moviItem["poster_path"] != null
-                                    ? ClipRRect(
-                                        borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(14),
-                                            topLeft: Radius.circular(14)),
-                                        child: Image.network(
-                                          'https://image.tmdb.org/t/p/w500${moviItem['poster_path']}',
-                                          width: 120,
-                                          height: 130,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : Icon(Icons.movie),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      moviItem['title'] ?? 'العنوان غير متوفر',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        moviItem['overview'] ??
-                                            'الملخص غير متوفر',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              //    Spacer(flex: 1),
-                              BlocBuilder<HomeCubit, HomeState>(
-                                bloc: homeCubit,
-                                buildWhen: (previous, current) {
-                                  return (current is HomeFavoriteLoaded &&
-                                          current.movieTitle ==
-                                              moviItem['title']) ||
-                                      (current is HomeFavoriteLoading &&
-                                          current.movieTitle ==
-                                              moviItem['title']) ||
-                                      current is HomeFavoriteError;
-                                },
-                                builder: (context, state) {
-                                  if (state is HomeFavoriteLoading) {
-                                    return CircularProgressIndicator.adaptive();
-                                  } else if (state is HomeFavoriteLoaded) {
-                                    return IconButton(
-                                      onPressed: () async {
-                                        await homeCubit.setFavorite(moviItem);
-                                      },
-                                      icon: Icon(
-                                        state.isFavorite
-                                            ? Icons.favorite
-                                            : Icons.favorite_border_outlined,
-                                        color: state.isFavorite
-                                            ? Colors.red
-                                            : Colors.blue,
-                                      ),
-                                    );
-                                  } else if (state is HomeFavoriteError) {
-                                    var isFavorite =
-                                        moviItem['isFavorite'] ?? false;
-                                    return IconButton(
-                                      onPressed: () async {
-                                        await homeCubit.setFavorite(moviItem);
-                                      },
-                                      icon: Icon(
-                                          isFavorite
-                                              ? Icons.favorite
-                                              : Icons.favorite_border_outlined,
-                                          color: isFavorite
-                                              ? Colors.red
-                                              : Colors.black),
-                                    );
-                                  } else {
-                                    var isFavorite =
-                                        moviItem['isFavorite'] ?? false;
-                                    return IconButton(
-                                      onPressed: () async {
-                                        try {
-                                          await homeCubit.setFavorite(moviItem);
-                                        } catch (e) {
-                                          print('Error occurred: $e');
-                                        }
-                                      },
-                                      icon: Icon(
-                                        isFavorite
-                                            ? Icons.favorite
-                                            : Icons.favorite_border_outlined,
-                                        color: isFavorite
-                                            ? Colors.red
-                                            : Colors.amber,
-                                      ),
-                                    );
-                                  }
-                                },
-                              )
-                            ]),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          } else if (state is HomeListLoading) {
-            return Center(child: CircularProgressIndicator.adaptive());
-          } else if (state is HomeListError) {
-            return Center(child: Text(state.message));
-          } else {
-            return Container(color: Colors.amber);
-          }
-        },
-      ),
-    );
-  }
-}
+//   Map<int, String> genres = {
+//     28: "الأكشن",
+//     10749: "الرومنسي",
+//     35: "الكوميديا",
+//     18: "الدراما",
+//     80: "الجريمة",
+//     27: "الرعب",
+//     878: "الخيال العلمي",
+//     10752: "الحروب",
+//   };
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('اختر اللغة والنوع'),
+//         backgroundColor: Colors.blue,
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(8.0),
+//         child: SafeArea(
+//           child: Column(
+//             children: [
+//               // اختر اللغة
+//               Row(
+//                 children: [
+//                   Text(
+//                     'اختر اللغة: ',
+//                     style: TextStyle(fontSize: 18),
+//                   ),
+//                   Spacer(),
+//                   DropdownButton<String>(
+//                     value: selectedLanguage,
+//                     hint: Text('اختر اللغة'),
+//                     items: languages.keys.map((langCode) {
+//                       return DropdownMenuItem<String>(
+//                         value: langCode,
+//                         child: Text(languages[langCode]!),
+//                       );
+//                     }).toList(),
+//                     onChanged: (value) {
+//                       setState(() {
+//                         selectedLanguage = value;
+//                       });
+//                     },
+//                   ),
+//                 ],
+//               ),
+//               SizedBox(height: 16),
+
+//               // اختر النوع
+//               Text(
+//                 'اختر نوع الفيلم: ',
+//                 style: TextStyle(fontSize: 18),
+//               ),
+//               SizedBox(height: 10),
+//               Expanded(
+//                 child: GridView.builder(
+//                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//                     crossAxisCount: 2,
+//                     childAspectRatio: 1.5,
+//                     crossAxisSpacing: 10,
+//                     mainAxisSpacing: 10,
+//                   ),
+//                   itemCount: genres.length,
+//                   itemBuilder: (context, index) {
+//                     int genreId = genres.keys.elementAt(index);
+//                     String genreName = genres[genreId]!;
+
+//                     return GestureDetector(
+//                       onTap: () {
+//                         setState(() {
+//                           selectedGenre = genreId;
+//                         });
+//                       },
+//                       child: Card(
+//                         color: selectedGenre == genreId
+//                             ? Colors.blue
+//                             : Colors.white,
+//                         elevation: 5,
+//                         shape: RoundedRectangleBorder(
+//                           borderRadius: BorderRadius.circular(10),
+//                         ),
+//                         child: Center(
+//                           child: Text(
+//                             genreName,
+//                             textAlign: TextAlign.center,
+//                             style: TextStyle(
+//                               fontSize: 18,
+//                               fontWeight: FontWeight.bold,
+//                               color: selectedGenre == genreId
+//                                   ? Colors.white
+//                                   : Colors.black,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     );
+//                   },
+//                 ),
+//               ),
+
+//               // زر للانتقال إلى صفحة عرض الأفلام
+//               ElevatedButton(
+//                 onPressed: () {
+//                   if (selectedLanguage != null && selectedGenre != null) {
+//                     // الانتقال إلى صفحة عرض الأفلام عند اختيار اللغة والنوع
+//                     Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (context) => MoviesPage(
+//                           selectedLanguage: selectedLanguage!,
+//                           selectedGenre: selectedGenre!,
+//                         ),
+//                       ),
+//                     );
+//                   } else {
+//                     // إذا لم يتم اختيار اللغة أو النوع، عرض رسالة
+//                     ScaffoldMessenger.of(context).showSnackBar(
+//                       SnackBar(content: Text('يرجى اختيار اللغة والنوع')),
+//                     );
+//                   }
+//                 },
+//                 child: Text('عرض الأفلام'),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+// // import 'dart:convert';
+// // import 'package:flutter/material.dart';
+// // import 'package:http/http.dart' as http;
+// // import 'package:movi/utils/app_constant.dart'; // تأكد من صحة المسار
+
+// // class LanguageGiner extends StatefulWidget {
+// //   const LanguageGiner({super.key});
+
+// //   @override
+// //   _LanguageGinerState createState() => _LanguageGinerState();
+// // }
+
+// // class _LanguageGinerState extends State<LanguageGiner> {
+// //   final String apiKey = AppConstants.moviApiKey; // تأكد من أنك تعرف قيمة API Key بشكل صحيح
+// //   final String apiUrl = 'https://api.themoviedb.org/3/discover/movie';
+
+// //   List movies = [];
+// //   String? selectedLanguage; // لا توجد قيمة بدائية
+// //   int? selectedGenre; // لا توجد قيمة بدائية
+
+// //   bool isLoading = false; // لعرض مؤشر التحميل أثناء جلب البيانات
+
+// //   Map<String, String> languages = {
+// //     'ar': "العربية",
+// //     'en': "الإنجليزية",
+// //     'fr': "الفرنسية",
+// //   };
+
+// //   Map<int, String> genres = {
+// //     28: "الأكشن",
+// //     10749: "الرومنسي",
+// //     35: "الكوميديا",
+// //     18: "الدراما",
+// //     80: "الجريمة",
+// //     27: "الرعب",
+// //     878: "الخيال العلمي",
+// //     10752: "الحروب",
+// //   };
+
+// //   @override
+// //   void initState() {
+// //     super.initState();
+// //   }
+
+// //   // دالة لجلب الأفلام بناءً على اللغة والنوع المحدد
+// //   Future<void> fetchMovies() async {
+// //     if (selectedLanguage == null || selectedGenre == null) {
+// //       // إذا لم يتم تحديد اللغة أو النوع، لا نقوم بتحميل الأفلام
+// //       return;
+// //     }
+
+// //     setState(() {
+// //       isLoading = true; // تفعيل مؤشر التحميل
+// //     });
+
+// //     final url = Uri.parse(
+// //       '$apiUrl?api_key=$apiKey&language=$selectedLanguage&with_genres=$selectedGenre&page=1',
+// //     );
+// //     try {
+// //       final response = await http.get(url);
+
+// //       if (response.statusCode == 200) {
+// //         final data = json.decode(response.body);
+// //         setState(() {
+// //           movies = data['results'];
+// //         });
+// //       } else {
+// //         print('فشل في تحميل الأفلام: ${response.statusCode}');
+// //         setState(() {
+// //           movies = []; // إذا فشل التحميل، اجعل القائمة فارغة
+// //         });
+// //       }
+// //     } catch (e) {
+// //       print('حدث خطأ: $e');
+// //       setState(() {
+// //         movies = []; // في حالة حدوث استثناء، اجعل القائمة فارغة
+// //       });
+// //     } finally {
+// //       setState(() {
+// //         isLoading = false; // إيقاف مؤشر التحميل بعد تحميل البيانات
+// //       });
+// //     }
+// //   }
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     return Scaffold(
+// //       appBar: AppBar(
+// //         title: Text('اختر اللغة والنوع'),
+// //         backgroundColor: Colors.blue,
+// //       ),
+// //       body: Padding(
+// //         padding: const EdgeInsets.all(8.0),
+// //         child: SafeArea(
+// //           child: Column(
+// //             children: [
+// //               // اختر اللغة
+// //               Row(
+// //                 children: [
+// //                   Text(
+// //                     'اختر اللغة: ',
+// //                     style: TextStyle(fontSize: 18),
+// //                   ),
+// //                   Spacer(),
+// //                   DropdownButton<String>(
+// //                     value: selectedLanguage,
+// //                     hint: Text('اختر اللغة'),
+// //                     items: languages.keys.map((langCode) {
+// //                       return DropdownMenuItem<String>(
+// //                         value: langCode,
+// //                         child: Text(languages[langCode]!),
+// //                       );
+// //                     }).toList(),
+// //                     onChanged: (value) {
+// //                       setState(() {
+// //                         selectedLanguage = value;
+// //                       });
+// //                       fetchMovies(); // تحديث الأفلام بناءً على اللغة المختارة
+// //                     },
+// //                   ),
+// //                 ],
+// //               ),
+// //               SizedBox(height: 16),
+
+// //               // اختر النوع
+// //               Text(
+// //                 'اختر نوع الفيلم: ',
+// //                 style: TextStyle(fontSize: 18),
+// //               ),
+// //               SizedBox(height: 10),
+// //               Expanded(
+// //                 child: GridView.builder(
+// //                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+// //                     crossAxisCount: 2,
+// //                     childAspectRatio: 1.5,
+// //                     crossAxisSpacing: 10,
+// //                     mainAxisSpacing: 10,
+// //                   ),
+// //                   itemCount: genres.length,
+// //                   itemBuilder: (context, index) {
+// //                     int genreId = genres.keys.elementAt(index);
+// //                     String genreName = genres[genreId]!;
+
+// //                     return GestureDetector(
+// //                       onTap: () {
+// //                         setState(() {
+// //                           selectedGenre = genreId;
+// //                         });
+// //                         fetchMovies(); // تحميل الأفلام بناءً على النوع المختار
+// //                       },
+// //                       child: Card(
+// //                         color: selectedGenre == genreId
+// //                             ? Colors.blue
+// //                             : Colors.white,
+// //                         elevation: 5,
+// //                         shape: RoundedRectangleBorder(
+// //                           borderRadius: BorderRadius.circular(10),
+// //                         ),
+// //                         child: Center(
+// //                           child: Text(
+// //                             genreName,
+// //                             textAlign: TextAlign.center,
+// //                             style: TextStyle(
+// //                               fontSize: 18,
+// //                               fontWeight: FontWeight.bold,
+// //                               color: selectedGenre == genreId
+// //                                   ? Colors.white
+// //                                   : Colors.black,
+// //                             ),
+// //                           ),
+// //                         ),
+// //                       ),
+// //                     );
+// //                   },
+// //                 ),
+// //               ),
+
+// //               // عرض الأفلام بناءً على النوع المحدد
+// //               SizedBox(height: 16),
+// //               Text('الأفلام:'),
+// //               Expanded(
+// //                 child: isLoading
+// //                     ? Center(child: CircularProgressIndicator()) // عرض مؤشر التحميل عند الجلب
+// //                     : (selectedLanguage == null || selectedGenre == null)
+// //                         ? Center(child: Text('يرجى اختيار اللغة والنوع'))
+// //                         : movies.isEmpty
+// //                             ? Center(child: Text('لا توجد أفلام لعرضها')) // إذا كانت القائمة فارغة
+// //                             : ListView.builder(
+// //                                 itemCount: movies.length,
+// //                                 itemBuilder: (context, index) {
+// //                                   final movie = movies[index];
+// //                                   return Card(
+// //                                     margin: EdgeInsets.symmetric(vertical: 8),
+// //                                     child: ListTile(
+// //                                       leading: movie['poster_path'] != null
+// //                                           ? Image.network(
+// //                                               'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
+// //                                               height: 120,
+// //                                               width: 80,
+// //                                               fit: BoxFit.cover,
+// //                                             )
+// //                                           : Icon(Icons.movie),
+// //                                       title: Text(
+// //                                         movie['title'] ?? 'بدون عنوان',
+// //                                         style: TextStyle(fontSize: 18),
+// //                                       ),
+// //                                       subtitle: Text(
+// //                                         movie['overview'] ?? 'لا يوجد وصف',
+// //                                         style: TextStyle(fontSize: 14),
+// //                                         maxLines: 2,
+// //                                         overflow: TextOverflow.ellipsis,
+// //                                       ),
+// //                                     ),
+// //                                   );
+// //                                 },
+// //                               ),
+// //               ),
+// //             ],
+// //           ),
+// //         ),
+// //       ),
+// //     );
+// //   }
+// // }

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/home_cubit/home_movi_state.dart';
-import 'package:movi/model/top_headline_model.dart';
 import 'package:movi/services/catch.dart';
 import 'package:movi/utils/app_constant.dart';
 import 'package:http/http.dart' as http;
@@ -85,145 +84,97 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 
-  Future<void> fetchHomeCarouselData() async {
-    try {
-      emit(HomeCarouselLoading()); // تحديث الحالة إلى Loading
+  // Future<void> fetchHomeCarouselData() async {
+  //   try {
+  //     emit(HomeCarouselLoading()); // تحديث الحالة إلى Loading
 
-      // جلب البيانات من API مباشرة هنا
-      final response = await http.get(Uri.parse(AppConstants.moviApiKey));
+  //     // جلب البيانات من API مباشرة هنا
+  //     final response = await http.get(Uri.parse(AppConstants.moviApiKey));
 
-      if (response.statusCode == 200) {
-        // إذا كانت الاستجابة ناجحة، قم بتحليل البيانات
-        final data = json.decode(response.body);
-        final movies = data['results'];
+  //     if (response.statusCode == 200) {
+  //       // إذا كانت الاستجابة ناجحة، قم بتحليل البيانات
+  //       final data = json.decode(response.body);
+  //       final movies = data['results'];
 
-        // تغيير الحالة إلى HomeCarouselLoaded عند تحميل البيانات بنجاح
-        emit(HomeCarouselLoaded(movies));
-      } else {
-        // إذا فشل التحميل، نقوم بتغيير الحالة إلى HomeCarouselError
-        emit(HomeCarouselError('Failed to load movies'));
-      }
-    } catch (e) {
-      // في حال حدوث أي استثناء أثناء عملية التحميل
-      emit(HomeCarouselError(e.toString()));
+  //       // تغيير الحالة إلى HomeCarouselLoaded عند تحميل البيانات بنجاح
+  //       emit(HomeCarouselLoaded(movies));
+  //     } else {
+  //       // إذا فشل التحميل، نقوم بتغيير الحالة إلى HomeCarouselError
+  //       emit(HomeCarouselError('Failed to load movies'));
+  //     }
+  //   } catch (e) {
+  //     // في حال حدوث أي استثناء أثناء عملية التحميل
+  //     emit(HomeCarouselError(e.toString()));
+  //   }
+  // }
+
+  // Future<void> fetchMovieData() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         'https://api.themoviedb.org/3/discover/movie?api_key=${AppConstants.moviApiKey}'));
+
+  //     if (response.statusCode == 200) {
+  //       // طباعة الاستجابة للتحقق من البيانات
+  //       final data = json.decode(response.body);
+  //       print('Response Data: $data'); // طباعة البيانات لفحص الاستجابة
+
+  //       // تحقق من أن البيانات تحتوي على المفتاح 'results'
+  //       final movies =
+  //           data['results'] ?? []; // إذا كانت النتائج null استخدم قائمة فارغة
+  //       if (movies.isEmpty) {
+  //         emit(HomeListError("لا توجد أفلام في البيانات"));
+  //       } else {
+  //         emit(HomeListLoaded(movies)); // إرسال الأفلام
+  //       }
+  //     } else {
+  //       throw Exception('فشل تحميل البيانات: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     emit(HomeListError(e.toString())); // في حال حدوث خطأ
+  //   }
+  // }
+
+
+
+Future<void> setFavorite(Map<String, dynamic> moviItem) async {
+  emit(HomeFavoriteLoading(moviItem['title']));
+  try {
+    final prefs = await SharedPreferences.getInstance(); // الحصول على SharedPreferences
+    final movieKey = 'favorite_${moviItem['title']}';
+
+    // إذا كانت المفضلة موجودة بالفعل
+    final isFavorite = prefs.getBool(movieKey) ?? false;
+
+    if (isFavorite) {
+      await prefs.remove(movieKey);  // إزالة المفضلة
+      moviItem['isFavorite'] = false;
+    } else {
+      await prefs.setBool(movieKey, true);  // إضافة المفضلة
+      moviItem['isFavorite'] = true;
     }
+
+    emit(HomeFavoriteLoaded(moviItem['title'], moviItem['isFavorite']));
+  } catch (e) {
+    emit(HomeFavoriteError(message: e.toString()));
   }
+}
 
-  Future<void> fetchMovieData() async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://api.themoviedb.org/3/discover/movie?api_key=${AppConstants.moviApiKey}'));
 
-      if (response.statusCode == 200) {
-        // طباعة الاستجابة للتحقق من البيانات
-        final data = json.decode(response.body);
-        print('Response Data: $data'); // طباعة البيانات لفحص الاستجابة
 
-        // تحقق من أن البيانات تحتوي على المفتاح 'results'
-        final movies =
-            data['results'] ?? []; // إذا كانت النتائج null استخدم قائمة فارغة
-        if (movies.isEmpty) {
-          emit(HomeListError("لا توجد أفلام في البيانات"));
-        } else {
-          emit(HomeListLoaded(movies)); // إرسال الأفلام
-        }
-      } else {
-        throw Exception('فشل تحميل البيانات: ${response.statusCode}');
-      }
-    } catch (e) {
-      emit(HomeListError(e.toString())); // في حال حدوث خطأ
-    }
-  }
 
-//   Future<void> setFavorite(Movie movie) async {
-//   emit(HomeFavoriteLoading(movie.title!));
-//   try {
-//     final chosenArticle = await catchServices.getString("favorite_${movie.title}");
-//     if (chosenArticle != null) {
-//       await catchServices.remove("favorite_${movie.title}");
-//       movie.isFavorite = false;
-//     } else {
-//       await catchServices.setString(
-//           'favorite_${movie.title}', json.encode(movie.toMap()));
-//       movie.isFavorite = true;
-//     }
-//     emit(HomeFavoriteLoaded(movie.title!, movie.isFavorite));
-//   } catch (e) {
-//     emit(HomeFavoriteError(message: e.toString()));
-//   }
-// }
-  Future<void> setFavorite(Movie movie) async {
-    //   emit(HomeFavoriteLoading(movie.title!));
+  // Future<void> addFavorite(Movie movie) async {
+  //   _favoriteMovies[movie.title!] = true; // إضافة الفيلم إلى المفضلة
+  //   emit(HomeFavoriteLoaded(movie.title!, true)); // تحديث الحالة
+  // }
 
-    //   try {
-    //     final chosenArticle =
-    //         await catchServices.getString("favorite_${movie.title}");
+  // // دالة لإزالة الفيلم من المفضلة
+  // Future<void> removeFavorite(Movie movie) async {
+  //   _favoriteMovies[movie.title!] = false; // إزالة الفيلم من المفضلة
+  //   emit(HomeFavoriteLoaded(movie.title!, false)); // تحديث الحالة
+  // }
 
-    //     if (chosenArticle != null) {
-    //       await catchServices.remove("favorite_${movie.title}");
-    //       movie.isFavorite = false;
-    //     } else {
-    //       await catchServices.setString(
-    //           'favorite_${movie.title}', json.encode(movie.toMap()));
-    //       movie.isFavorite = true;
-    //     }
-
-    //     emit(HomeFavoriteLoaded(movie.title!, movie.isFavorite));
-    //   } catch (e) {
-    //     emit(HomeFavoriteError(message: e.toString()));
-    //   }
-    // }
-
-    emit(HomeFavoriteLoading(movie.title!));
-    try {
-      final chosenmovie =
-          await catchServices.getString("favorite_${movie.title}");
-      if (chosenmovie != null) {
-        await catchServices.remove("favorite_${movie.title}");
-        movie.isFavorite = false;
-      } else {
-        await catchServices.setString(
-            'favorite_${movie.title}', json.encode(movie.toMap()));
-        movie.isFavorite = true;
-      }
-      emit(HomeFavoriteLoaded(movie.title!, movie.isFavorite));
-    } catch (e) {
-      emit(HomeFavoriteError(message: e.toString()));
-    }
-  }
-// Future<void> setFavorite(Movie movie) async {
-//   emit(HomeFavoriteLoading(movie.title!));
-
-//   try {
-//     final chosenArticle = await catchServices.getString("favorite_${movie.title}");
-
-//     if (chosenArticle != null) {
-//       await catchServices.remove("favorite_${movie.title}");
-//       movie.isFavorite = false;
-//     } else {
-//       await catchServices.setString('favorite_${movie.title}', json.encode(movie.toMap()));
-//       movie.isFavorite = true;
-//     }
-
-//     emit(HomeFavoriteLoaded(movie.title!, movie.isFavorite));
-//   } catch (e) {
-//     emit(HomeFavoriteError(message: e.toString()));
-//   }
-// }
-
-  Future<void> addFavorite(Movie movie) async {
-    _favoriteMovies[movie.title!] = true; // إضافة الفيلم إلى المفضلة
-    emit(HomeFavoriteLoaded(movie.title!, true)); // تحديث الحالة
-  }
-
-  // دالة لإزالة الفيلم من المفضلة
-  Future<void> removeFavorite(Movie movie) async {
-    _favoriteMovies[movie.title!] = false; // إزالة الفيلم من المفضلة
-    emit(HomeFavoriteLoaded(movie.title!, false)); // تحديث الحالة
-  }
-
-  // دالة لاسترجاع حالة المفضلة
-  bool isFavorite(Movie movie) {
-    return _favoriteMovies[movie.title!] ?? false;
-  }
+  // // دالة لاسترجاع حالة المفضلة
+  // bool isFavorite(Movie movie) {
+  //   return _favoriteMovies[movie.title!] ?? false;
+  // }
 }

@@ -39,7 +39,7 @@ class PopularMovie extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 9),
+        // const SizedBox(height: 5),
         BlocBuilder<HomeCubit, HomeState>(
           bloc: homeCubit,
           buildWhen: (previous, current) =>
@@ -50,7 +50,7 @@ class PopularMovie extends StatelessWidget {
             if (state is HomeListLoaded) {
               final movieList = state.movies;
               return SizedBox(
-                height: 300,
+                height: 170,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: movieList.length,
@@ -66,7 +66,7 @@ class PopularMovie extends StatelessWidget {
                                 ? Image.network(
                                     'https://image.tmdb.org/t/p/w500${movieItem['poster_path']}',
                                     width: 120,
-                                    //  height: 140,
+                                    height: 130,
                                     fit: BoxFit.cover,
                                   )
                                 : Icon(Icons.movie),
