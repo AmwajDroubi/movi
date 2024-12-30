@@ -1,3 +1,5 @@
+//*_*
+
 import 'package:flutter/material.dart';
 import 'package:movi/views/first.dart';
 
@@ -6,6 +8,9 @@ class IntroductionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Center(
@@ -15,36 +20,35 @@ class IntroductionPage extends StatelessWidget {
           Text(
             "Welcom To Pop Movies App",
             style: TextStyle(
-                fontSize: 32,
+                fontSize: screenWidth * .075,
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
                 fontFamily: "PlayfairDisplay",
                 fontStyle: FontStyle.italic),
           ),
           SizedBox(
-            height: 40,
+            height: screenHeight * .01,
           ),
           Container(
-              height: 370,
+              height: screenHeight * .4,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(50),
                 child: Image.asset("assets/image/pop.jpg",
-                    fit: BoxFit.fill, width: 370),
+                    fit: BoxFit.fill, width: screenWidth * .9),
               )),
           Text(
             " Pop Movies",
             style: TextStyle(
-                fontSize: 45,
+                fontSize: screenWidth * .15,
                 color: Colors.blue,
                 fontFamily: "Trirong",
                 fontWeight: FontWeight.bold),
           ),
           SizedBox(
-            height: 80,
+            height: screenHeight * .08,
           ),
           Container(
-            height: 60,
-            // width: 150,
+            height: screenHeight * .09,
             color: Colors.blue[200],
             child: ElevatedButton(
                 onPressed: () {
@@ -54,7 +58,7 @@ class IntroductionPage extends StatelessWidget {
                 child: Text(
                   "Click to continue",
                   style: TextStyle(
-                      fontSize: 24,
+                      fontSize: screenWidth * .06,
                       color: Colors.grey[600],
                       fontWeight: FontWeight.bold,
                       fontFamily: "PlayfairDisplay"),

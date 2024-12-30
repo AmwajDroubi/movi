@@ -1,3 +1,4 @@
+//*_*
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/home_cubit/home_movi_cubit.dart';
@@ -10,7 +11,8 @@ class TopRatedMovies extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HomeCubit>(context);
-
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -21,7 +23,7 @@ class TopRatedMovies extends StatelessWidget {
             children: [
               Text('Top Rated Movies',
                   style: TextStyle(
-                      fontSize: 28,
+                      fontSize: screenWidth * .07,
                       fontFamily: "PlayfairDisplay",
                       color: Colors.blue[700])),
               Spacer(),
@@ -33,7 +35,8 @@ class TopRatedMovies extends StatelessWidget {
                   },
                   child: Text(
                     "See all",
-                    style: TextStyle(color: Colors.grey[600], fontSize: 17),
+                    style: TextStyle(
+                        color: Colors.grey[600], fontSize: screenWidth * .04),
                   ))
             ],
           ),
@@ -48,7 +51,7 @@ class TopRatedMovies extends StatelessWidget {
             if (state is HomeListLoaded) {
               final movieList = state.movies;
               return SizedBox(
-                height: 170,
+                height: screenHeight * .188,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: movieList.length,
@@ -62,16 +65,17 @@ class TopRatedMovies extends StatelessWidget {
                             movieItem["poster_path"] != null
                                 ? Image.network(
                                     'https://image.tmdb.org/t/p/w500${movieItem['poster_path']}',
-                                    width: 120,
-                                    height: 130,
+                                    width: screenWidth * .27,
+                                    height: screenHeight * .147,
                                     fit: BoxFit.cover,
                                   )
                                 : Icon(Icons.movie),
-                            SizedBox(height: 10),
+                            SizedBox(height: screenHeight * .01),
                             Text(
                               movieItem['title'] ?? 'عنوان غير متوفر',
                               style: TextStyle(
-                                  fontSize: 16.5, color: Colors.grey[600]),
+                                  fontSize: screenWidth * .042,
+                                  color: Colors.grey[600]),
                             )
                           ],
                         ),
@@ -95,9 +99,6 @@ class TopRatedMovies extends StatelessWidget {
             }
           },
         ),
-        // SizedBox(
-        //   height: 20,
-        // ),
       ],
     );
   }

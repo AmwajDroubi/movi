@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/home_cubit/home_movi_cubit.dart';
 import 'package:movi/block/home_cubit/home_movi_state.dart';
-import 'package:movi/views/test2.dart';
 import 'package:movi/widget/details.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,7 +16,6 @@ class _AllTopState extends State<AllTop> {
   @override
   void initState() {
     super.initState();
-    // تحميل الأفلام عند بدء الصفحة
     final homeCubit = BlocProvider.of<HomeCubit>(context);
     homeCubit.fetchAllTopRatedMovies();
   }
@@ -25,19 +23,22 @@ class _AllTopState extends State<AllTop> {
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HomeCubit>(context);
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "All Top rated movies",
           style: TextStyle(
-              fontSize: 25,
+              fontSize: screenHeight * .033,
               fontFamily: "PlayfairDisplay",
               color: Colors.blue[700]),
         ),
         centerTitle: true,
         leading: IconButton(
-            onPressed: Navigator.of(context).pop, icon: Icon(Icons.arrow_back)),
+            onPressed: Navigator.of(context).pop,
+            icon: const Icon(Icons.arrow_back)),
       ),
       body: BlocBuilder<HomeCubit, HomeState>(
         bloc: homeCubit,
@@ -76,17 +77,17 @@ class _AllTopState extends State<AllTop> {
                                 flex: 1,
                                 child: moviItem["poster_path"] != null
                                     ? ClipRRect(
-                                        borderRadius: BorderRadius.only(
+                                        borderRadius: const BorderRadius.only(
                                             bottomLeft: Radius.circular(14),
                                             topLeft: Radius.circular(14)),
                                         child: Image.network(
                                           'https://image.tmdb.org/t/p/w500${moviItem['poster_path']}',
-                                          width: 120,
-                                          height: 130,
+                                          width: screenWidth * .27,
+                                          height: screenHeight * .147,
                                           fit: BoxFit.cover,
                                         ),
                                       )
-                                    : Icon(Icons.movie),
+                                    : const Icon(Icons.movie),
                               ),
                               Expanded(
                                 flex: 3,
@@ -95,7 +96,7 @@ class _AllTopState extends State<AllTop> {
                                     Text(
                                       moviItem['title'] ?? 'العنوان غير متوفر',
                                       style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: screenWidth * .049,
                                           fontWeight: FontWeight.bold),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -106,7 +107,7 @@ class _AllTopState extends State<AllTop> {
                                         moviItem['overview'] ??
                                             'الملخص غير متوفر',
                                         style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: screenWidth * .035,
                                             fontWeight: FontWeight.bold),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
@@ -127,30 +128,24 @@ class _AllTopState extends State<AllTop> {
                                       current is HomeFavoriteError;
                                 },
                                 builder: (context, state) {
-                                  // قراءة حالة المفضلة من SharedPreferences عند بناء الواجهة
                                   bool isFavorite =
                                       moviItem['isFavorite'] ?? false;
                                   _loadFavoriteStatus(moviItem);
 
                                   return IconButton(
                                     onPressed: () async {
-                                      // عند التفاعل مع الأيقونة، نقوم بتحديث حالة المفضلة
                                       await homeCubit.setFavorite(moviItem);
 
-                                      // تحديث القيمة في SharedPreferences
                                       final prefs =
                                           await SharedPreferences.getInstance();
                                       final movieKey =
                                           'favorite_${moviItem['title']}';
                                       moviItem['isFavorite'] =
-                                          !moviItem['isFavorite']; // عكس الحالة
+                                          !moviItem['isFavorite'];
                                       await prefs.setBool(
-                                          movieKey,
-                                          moviItem[
-                                              'isFavorite']); // حفظها كـ bool
+                                          movieKey, moviItem['isFavorite']);
 
-                                      setState(
-                                          () {}); // إعادة بناء واجهة المستخدم
+                                      setState(() {});
                                     },
                                     icon: Icon(
                                       isFavorite
@@ -172,7 +167,7 @@ class _AllTopState extends State<AllTop> {
               },
             );
           } else if (state is HomeListLoading) {
-            return Center(child: CircularProgressIndicator.adaptive());
+            return const Center(child: CircularProgressIndicator.adaptive());
           } else if (state is HomeListError) {
             return Center(child: Text(state.message));
           } else {
@@ -183,15 +178,13 @@ class _AllTopState extends State<AllTop> {
     );
   }
 
-  // قراءة حالة المفضلة من SharedPreferences
   Future<void> _loadFavoriteStatus(Map<String, dynamic> moviItem) async {
     final prefs = await SharedPreferences.getInstance();
     final movieKey = 'favorite_${moviItem['title']}';
-    bool isFavorite = prefs.getBool(movieKey) ??
-        false; // التأكد من أن القيمة التي تقرأها هي bool
+    bool isFavorite = prefs.getBool(movieKey) ?? false;
 
     setState(() {
-      moviItem['isFavorite'] = isFavorite; // تحديث حالة المفضلة في moviItem
+      moviItem['isFavorite'] = isFavorite;
     });
   }
 }

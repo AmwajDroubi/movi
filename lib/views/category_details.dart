@@ -1,8 +1,10 @@
+//*_*
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movi/utils/app_constant.dart';
-import 'package:movi/widget/details.dart'; // تأكد من صحة المسار
+import 'package:movi/widget/details.dart';
 
 class MoviesPage extends StatefulWidget {
   final String selectedLanguage;
@@ -15,12 +17,11 @@ class MoviesPage extends StatefulWidget {
 }
 
 class _MoviesPageState extends State<MoviesPage> {
-  final String apiKey =
-      AppConstants.moviApiKey; // تأكد من أنك تعرف قيمة API Key بشكل صحيح
+  final String apiKey = AppConstants.moviApiKey;
   final String apiUrl = 'https://api.themoviedb.org/3/discover/movie';
 
   List movies = [];
-  bool isLoading = false; // لعرض مؤشر التحميل أثناء جلب البيانات
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -28,58 +29,60 @@ class _MoviesPageState extends State<MoviesPage> {
     fetchMovies();
   }
 
-  // دالة لجلب الأفلام بناءً على اللغة والنوع المحدد
   Future<void> fetchMovies() async {
     setState(() {
-      isLoading = true; // تفعيل مؤشر التحميل
+      isLoading = true;
     });
 
     final url = Uri.parse(
       '$apiUrl?api_key=$apiKey&language=${widget.selectedLanguage}&with_genres=${widget.selectedGenre}&page=1',
     );
 
-    print('طلب جلب الأفلام من الرابط: $url'); // طباعة الرابط للتحقق منه
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-
-        // طباعة الاستجابة للتحقق من البيانات
-        print('استجابة API: $data');
-
         setState(() {
-          movies = data['results'] ??
-              []; // إذا كانت البيانات فارغة، يتم تعيين قائمة فارغة
+          movies = data['results'] ?? [];
         });
       } else {
         print('فشل في تحميل الأفلام: ${response.statusCode}');
         setState(() {
-          movies = []; // إذا فشل التحميل، اجعل القائمة فارغة
+          movies = [];
         });
       }
     } catch (e) {
       print('حدث خطأ: $e');
       setState(() {
-        movies = []; // في حالة حدوث استثناء، اجعل القائمة فارغة
+        movies = [];
       });
     } finally {
       setState(() {
-        isLoading = false; // إيقاف مؤشر التحميل بعد تحميل البيانات
+        isLoading = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double sliderHeight = screenHeight * 0.30;
+
+    double titleFontSize = screenWidth * 0.05; 
+    double subtitleFontSize = screenWidth * 0.04; 
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'الأفلام',
           style: TextStyle(
-              fontSize: 25,
-              fontFamily: "PlayfairDisplay",
-              color: Colors.blue[700]),
+            fontSize: titleFontSize,
+            fontFamily: "PlayfairDisplay",
+            color: Colors.blue[700],
+          ),
         ),
         backgroundColor: Colors.white,
         centerTitle: true,
@@ -90,27 +93,25 @@ class _MoviesPageState extends State<MoviesPage> {
           child: Column(
             children: [
               isLoading
-                  ? Center(
-                      child: CircularProgressIndicator()) // عرض مؤشر التحميل
+                  ? Center(child: CircularProgressIndicator())
                   : movies.isEmpty
-                      ? Center(
-                          child: Text(
-                              'لا توجد أفلام لعرضها')) // إذا كانت القائمة فارغة
+                      ? Center(child: Text('لا توجد أفلام لعرضها'))
                       : Expanded(
                           child: ListView.builder(
                             itemCount: movies.length,
                             itemBuilder: (context, index) {
                               final movie = movies[index];
-
-                              // التأكد من وجود الصورة
                               final posterPath = movie['poster_path'];
 
                               return InkWell(
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
                                       builder: (context) => MovieDetailsPage(
-                                            movie: movie,
-                                          )));
+                                        movie: movie,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 child: Card(
                                   margin: EdgeInsets.symmetric(vertical: 8),
@@ -118,18 +119,21 @@ class _MoviesPageState extends State<MoviesPage> {
                                     leading: posterPath != null
                                         ? Image.network(
                                             'https://image.tmdb.org/t/p/w500$posterPath',
-                                            height: 120,
-                                            width: 80,
+                                            height:
+                                                sliderHeight, // استخدام النسبة المئوية للارتفاع
+                                            width: screenWidth *
+                                                0.25, // عرض الصورة كنسبة مئوية من عرض الشاشة
                                             fit: BoxFit.cover,
                                           )
                                         : Icon(Icons.movie),
                                     title: Text(
                                       movie['title'] ?? 'بدون عنوان',
-                                      style: TextStyle(fontSize: 18),
+                                      style: TextStyle(fontSize: titleFontSize),
                                     ),
                                     subtitle: Text(
                                       movie['overview'] ?? 'لا يوجد وصف',
-                                      style: TextStyle(fontSize: 14),
+                                      style:
+                                          TextStyle(fontSize: subtitleFontSize),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),

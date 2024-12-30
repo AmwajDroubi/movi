@@ -1,3 +1,4 @@
+//*_*
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/sldider_cubit/movi_slider_cubit.dart';
@@ -7,6 +8,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 class MovieSliderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -19,7 +22,7 @@ class MovieSliderScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text('Soon Movies',
                       style: TextStyle(
-                          fontSize: 28,
+                          fontSize: screenWidth * .07,
                           fontFamily: "PlayfairDisplay",
                           color: Colors.blue[700])),
                 ),
@@ -28,7 +31,8 @@ class MovieSliderScreen extends StatelessWidget {
                     onPressed: () {},
                     child: Text(
                       "See all",
-                      style: TextStyle(color: Colors.grey[600], fontSize: 17),
+                      style: TextStyle(
+                          color: Colors.grey[600], fontSize: screenWidth * .04),
                     ))
               ],
             ),
@@ -69,7 +73,6 @@ class MovieSliderScreen extends StatelessWidget {
                                 'https://image.tmdb.org/t/p/w500$posterPath',
                                 fit: BoxFit.cover,
                                 width: double.infinity,
-                                //   height: 220,
                               ),
                               Container(
                                 color: Colors.black54,
@@ -77,9 +80,9 @@ class MovieSliderScreen extends StatelessWidget {
                                     vertical: 10.0, horizontal: 15.0),
                                 child: Text(
                                   title,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 18.0,
+                                    fontSize: screenWidth * .04,
                                     fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.center,
@@ -91,15 +94,12 @@ class MovieSliderScreen extends StatelessWidget {
                       );
                     },
                     options: CarouselOptions(
-                      //   height: 170.0,
                       autoPlay: true,
-                      enlargeCenterPage:
-                          true, //بتعمل مسافة بين الصور وبتبرز الصورة للأمام
+                      enlargeCenterPage: true,
                       aspectRatio: 16 /
                           9, // هذه تعني نسبة العرض الى الارتفاع يعني العرض 16 بالنسبة للارتفاع 9
                       autoPlayInterval: const Duration(seconds: 3),
-                      viewportFraction:
-                          0.9, //النسبة 90بالمية من العرض خمسة بالمية يمين وخمسة بالمية يسار
+                      viewportFraction: 0.9,
                     ),
                   );
                 }

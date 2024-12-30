@@ -1,3 +1,5 @@
+//*_*
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +26,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     10752: "الحروب",
   };
 
-  List actors = []; // قائمة لتخزين الممثلين
+  List actors = [];
 
   @override
   void initState() {
@@ -32,35 +34,30 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
     fetchMovieDetails();
   }
 
-  // دالة لتحميل تفاصيل الفيلم والممثلين
   Future<void> fetchMovieDetails() async {
-    final movieId = widget.movie['id']; // الحصول على معرّف الفيلم
+    final movieId = widget.movie['id'];
     final apiKey = AppConstants.moviApiKey;
     final url = Uri.parse(
-        'https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey&language=ar'); // استدعاء API للحصول على الممثلين
+        'https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey&language=ar');
 
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
-        actors = data['cast']; // استلام قائمة الممثلين
+        actors = data['cast'];
       });
 
-      // ترتيب الممثلين حسب الشعبية (popularity) بشكل تنازلي واختيار 5 أشهر ممثلين فقط
       actors.sort((a, b) {
-        return (b['popularity'] ?? 0)
-            .compareTo(a['popularity'] ?? 0); // ترتيب الممثلين حسب الشعبية
+        return (b['popularity'] ?? 0).compareTo(a['popularity'] ?? 0);
       });
 
-      // تحديد أول 5 ممثلين فقط
       actors = actors.take(5).toList();
     } else {
       print('فشل في تحميل الممثلين: ${response.statusCode}');
     }
   }
 
-  // دالة لتحويل genre_ids إلى أسماء الأنواع
   String getGenres(List<dynamic> genreIds) {
     List<String> genreNames = [];
     for (var genreId in genreIds) {
@@ -73,13 +70,12 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     final movie = widget.movie;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
-    // استخراج genre_ids
     List<dynamic> genreIds = movie['genre_ids'] ?? [];
-    String movieGenres =
-        getGenres(genreIds); // تحويل genre_ids إلى أسماء الأنواع
+    String movieGenres = getGenres(genreIds);
 
     return Scaffold(
       body: SafeArea(
@@ -91,36 +87,39 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                 children: [
                   Image.network(
                     'https://image.tmdb.org/t/p/w500${movie['backdrop_path']}',
-                    height: 300,
+                    height: screenHeight * .39,
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
                   Positioned(
-                    top: 20,
-                    left: 10,
+                    top: screenHeight * .015,
+                    left: screenWidth * .015,
                     child: IconButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      icon: Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back),
                       color: Colors.blue,
                       iconSize: 30,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              SizedBox(height: screenHeight * .01),
               Text(
                 movie['title'] ?? 'العنوان غير متوفر',
                 style: TextStyle(
-                    fontSize: 35,
+                    fontSize: screenWidth * .097,
                     fontWeight: FontWeight.bold,
                     fontFamily: "Trirong",
                     color: Colors.grey),
               ),
+              SizedBox(
+                height: screenHeight * .01,
+              ),
               Container(
-                height: 60,
-                width: 300,
+                height: screenHeight * .075,
+                width: screenWidth * .7,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.grey[600],
@@ -132,15 +131,17 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           "Release :",
-                          style: TextStyle(fontSize: 22, color: Colors.white),
+                          style: TextStyle(
+                              fontSize: screenWidth * .06, color: Colors.white),
                         ),
                       ),
                       SizedBox(
-                        width: 10,
+                        width: screenWidth * .02,
                       ),
                       Text(
                         movie['release_date'] ?? 'التاريخ غير متوفر',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: screenWidth * .05, color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -148,11 +149,11 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                 ),
               ),
               SizedBox(
-                height: 8,
+                height: screenHeight * .013,
               ),
               Container(
-                height: 60,
-                width: 300,
+                height: screenHeight * .075,
+                width: screenWidth * .7,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: Colors.grey[600],
@@ -160,25 +161,27 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                 child: Center(
                   child: Text(
                     movieGenres ?? 'النوع غير متوفر',
-                    style: TextStyle(fontSize: 20, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: screenWidth * .06, color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: screenHeight * .013,
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "  Overview",
-                    style: TextStyle(fontSize: 28, color: Colors.grey),
+                    style: TextStyle(
+                        fontSize: screenWidth * .09, color: Colors.grey),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: Container(
-                      height: 200,
+                      height: screenHeight * .3,
                       decoration: BoxDecoration(
                           color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(20)),
@@ -186,7 +189,7 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                         padding: const EdgeInsets.all(12.0),
                         child: Text(
                           movie['overview'] ?? 'الوصف غير متوفر',
-                          style: TextStyle(fontSize: 18),
+                          style: TextStyle(fontSize: screenWidth * .044),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -194,18 +197,17 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                   ),
                 ],
               ),
-
-              // إضافة قسم الممثلين
-              SizedBox(height: 7),
+              SizedBox(height: screenHeight * .001),
               Text(
                 'أشهر الممثلين',
-                style: TextStyle(fontSize: 28, color: Colors.grey),
+                style:
+                    TextStyle(fontSize: screenWidth * .06, color: Colors.grey),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: screenHeight * .001),
               actors.isEmpty
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : Container(
-                      height: 150,
+                      height: screenHeight * .19,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: actors.length,
@@ -220,21 +222,23 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
                                         borderRadius: BorderRadius.circular(10),
                                         child: Image.network(
                                           'https://image.tmdb.org/t/p/w500${actor['profile_path']}',
-                                          height: 100,
-                                          width: 100,
+                                          height: screenHeight * .1,
+                                          width: screenWidth * .28,
                                           fit: BoxFit.cover,
                                         ),
                                       )
                                     : Container(
-                                        height: 150,
-                                        width: 100,
+                                        height: screenHeight * .1,
+                                        width: screenWidth * .28,
                                         color: Colors.grey,
-                                        child: Icon(Icons.person),
+                                        child: const Icon(Icons.person),
                                       ),
-                                SizedBox(height: 8),
+                                SizedBox(height: screenHeight * .009),
                                 Text(
                                   actor['name'] ?? 'غير معروف',
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(
+                                    fontSize: screenWidth * .039,
+                                  ),
                                   textAlign: TextAlign.center,
                                 ),
                               ],

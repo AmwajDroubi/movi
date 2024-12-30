@@ -23,8 +23,13 @@ class _FavoritesPageState extends State<FavoritesPage> {
     final keys = prefs.getKeys(); // قراءة جميع المفاتيح المخزنة
     List<Map<String, dynamic>> favorites = [];
 
+    print(
+        "المفاتيح المخزنة: $keys"); // طباعة المفاتيح للتأكد من أنها تحتوي على الأفلام المفضلة
+
+    // التحقق من وجود المفاتيح الخاصة بالأفلام المفضلة
     for (var key in keys) {
-      if (key.startsWith('favorite_')) {  // البحث عن المفاتيح التي تتعلق بالأفلام المفضلة
+      if (key.startsWith('favorite_')) {
+        // البحث عن المفاتيح التي تتعلق بالأفلام المفضلة
         bool isFavorite = prefs.getBool(key) ?? false;
         if (isFavorite) {
           String movieTitle = key.replaceFirst('favorite_', '');
@@ -34,7 +39,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
     }
 
     setState(() {
-      favoriteMovies = favorites;  // تحديث الحالة بقائمة الأفلام المفضلة
+      favoriteMovies = favorites; // تحديث الحالة بقائمة الأفلام المفضلة
     });
   }
 

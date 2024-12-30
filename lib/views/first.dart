@@ -1,8 +1,8 @@
+//*_*
 import 'package:flutter/material.dart';
-
 import 'package:movi/views/home_movi.dart';
 import 'package:movi/views/language_giner.dart';
-import 'package:movi/views/test2.dart';
+import 'package:movi/widget/search.dart';
 
 class SecondPAge extends StatefulWidget {
   const SecondPAge({
@@ -26,31 +26,24 @@ class _SecondPAge extends State<SecondPAge> {
               Tab(text: "Category"),
             ],
           ),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.search)),
         ),
-        body: Column(
+        body: const Column(
           children: [
             Expanded(
               flex: 3,
               child: TabBarView(
                 children: [
-                  // BlocProvider(
-                  // create: (context) {
-                  //   final cubit = HomeCubit();
-                  //   cubit.getHomeData();
-                  //   return cubit;
-                  // },
-                  //  child:
                   HomeBasic(),
-                  // ),
-                  // BlocProvider(
-                  //   create: (context) {
-                  //     final cubit = CategoryCubit();
-                  //     cubit.getCategoryData();
-                  //     return cubit;
-                  //   },
-                  // child:
                   LanguageGiner(),
-                  // ),
                 ],
               ),
             ),

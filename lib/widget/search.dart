@@ -1,3 +1,4 @@
+//*_*
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,15 +17,14 @@ class _SearchPageState extends State<SearchPage> {
 
   TextEditingController _searchController = TextEditingController();
 
-  final String apiKey = AppConstants.moviApiKey; // قم بإضافة مفتاح API الخاص بك من TMDB
+  final String apiKey = AppConstants.moviApiKey;
 
   @override
   void initState() {
     super.initState();
-    slct = srch; // في البداية، لا توجد بيانات للبحث
+    slct = srch;
   }
 
-  // دالة للبحث عن الأفلام عبر API
   Future<void> searchMovies(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -34,8 +34,7 @@ class _SearchPageState extends State<SearchPage> {
       return;
     }
 
-    // URL Encoding للنص المدخل ليتم معالجته بشكل صحيح
-    final encodedQuery = Uri.encodeComponent(query); 
+    final encodedQuery = Uri.encodeComponent(query);
 
     final response = await http.get(Uri.parse(
         'https://api.themoviedb.org/3/search/movie?api_key=$apiKey&query=$encodedQuery&language=ar'));
@@ -48,7 +47,7 @@ class _SearchPageState extends State<SearchPage> {
         srch = movies.map((movie) {
           return {
             "id": movie["id"],
-            "name": movie["title"], // اسم الفيلم
+            "name": movie["title"],
           };
         }).toList();
         slct = srch;
@@ -58,30 +57,30 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
-  // تعديل دالة choose لتصفية النتائج بناءً على الحرف الأول فقط
   void choose(String letter) {
     List<Map<String, dynamic>> result = [];
     if (letter.isEmpty) {
-      result = srch; // إذا كان النص فارغًا، نعرض جميع النتائج
+      result = srch;
     } else {
       result = srch
-          .where((movie) => movie["name"]
-              .toLowerCase()
-              .startsWith(letter.toLowerCase())) // استخدام startsWith
+          .where((movie) =>
+              movie["name"].toLowerCase().startsWith(letter.toLowerCase()))
           .toList();
     }
 
     setState(() {
-      slct = result; // تحديث النتائج المعروضة
+      slct = result;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: screenHeight * .06),
           Row(
             children: [
               IconButton(
@@ -92,8 +91,8 @@ class _SearchPageState extends State<SearchPage> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  height: 60,
-                  width: 345,
+                  height: screenHeight * .065,
+                  width: screenWidth * .8,
                   color: Colors.blue[100],
                   child: TextField(
                     controller: _searchController,
@@ -102,10 +101,12 @@ class _SearchPageState extends State<SearchPage> {
                       suffixIcon: Icon(Icons.search),
                     ),
                     onChanged: (value) {
-                      searchMovies(value); // عند تغيير النص، نقوم بالبحث عن الأفلام
-                      choose(value); // نقوم بتصفية النتائج بناءً على الحرف الأول
+                      searchMovies(
+                          value); 
+                      choose(
+                          value); 
                     },
-                    textDirection: TextDirection.rtl,  // تحديد اتجاه النص
+                    textDirection: TextDirection.rtl, 
                   ),
                 ),
               ),
@@ -113,14 +114,14 @@ class _SearchPageState extends State<SearchPage> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: slct.length, // عرض النتائج المفلترة
+              itemCount: slct.length,
               itemBuilder: (context, index) => Card(
                 key: ValueKey(slct[index]["id"]),
                 child: ListTile(
                   leading: Icon(Icons.movie),
                   title: Text(
                     slct[index]["name"],
-                    textDirection: TextDirection.rtl,  // تحديد اتجاه النص لعرض العربية بشكل صحيح
+                    textDirection: TextDirection.rtl,
                   ),
                 ),
               ),

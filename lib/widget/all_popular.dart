@@ -1,8 +1,8 @@
+//*_*
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movi/block/home_cubit/home_movi_cubit.dart';
 import 'package:movi/block/home_cubit/home_movi_state.dart';
-import 'package:movi/views/test2.dart';
 import 'package:movi/widget/details.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,22 +17,23 @@ class _AllPopularState extends State<AllPopular> {
   @override
   void initState() {
     super.initState();
-    // تأكد من تحميل البيانات عند بدء الصفحة
     final homeCubit = BlocProvider.of<HomeCubit>(context);
     homeCubit
-        .fetchAllPopularMovies(); // تأكد من أن هذه الدالة تقوم بتحميل البيانات.
+        .fetchAllPopularMovies(); 
   }
 
   @override
   Widget build(BuildContext context) {
     final homeCubit = BlocProvider.of<HomeCubit>(context);
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "All Popular movies",
           style: TextStyle(
-              fontSize: 25,
+              fontSize: screenHeight * .033,
               fontFamily: "PlayfairDisplay",
               color: Colors.blue[700]),
         ),
@@ -82,8 +83,8 @@ class _AllPopularState extends State<AllPopular> {
                                             topLeft: Radius.circular(14)),
                                         child: Image.network(
                                           'https://image.tmdb.org/t/p/w500${moviItem['poster_path']}',
-                                          width: 120,
-                                          height: 130,
+                                          width: screenWidth * .27,
+                                          height: screenHeight * .147,
                                           fit: BoxFit.cover,
                                         ),
                                       )
@@ -96,7 +97,7 @@ class _AllPopularState extends State<AllPopular> {
                                     Text(
                                       moviItem['title'] ?? 'العنوان غير متوفر',
                                       style: TextStyle(
-                                          fontSize: 18,
+                                          fontSize: screenWidth * .049,
                                           fontWeight: FontWeight.bold),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -107,7 +108,7 @@ class _AllPopularState extends State<AllPopular> {
                                         moviItem['overview'] ??
                                             'الملخص غير متوفر',
                                         style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: screenWidth * .035,
                                             fontWeight: FontWeight.bold),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
@@ -131,12 +132,10 @@ class _AllPopularState extends State<AllPopular> {
                                   bool isFavorite =
                                       moviItem['isFavorite'] ?? false;
 
-                                  // التأكد من أن المفضلة يتم تحميلها بشكل صحيح من SharedPreferences
                                   _loadFavoriteStatus(moviItem);
 
                                   return IconButton(
                                     onPressed: () async {
-                                      // عند الضغط على الأيقونة نقوم بتغيير حالة المفضلة
                                       await homeCubit.setFavorite(moviItem);
 
                                       final prefs =
@@ -144,16 +143,12 @@ class _AllPopularState extends State<AllPopular> {
                                       final movieKey =
                                           'favorite_${moviItem['title']}';
 
-                                      // تحديث حالة المفضلة في SharedPreferences
                                       moviItem['isFavorite'] =
-                                          !moviItem['isFavorite']; // عكس الحالة
+                                          !moviItem['isFavorite'];
                                       await prefs.setBool(
-                                          movieKey,
-                                          moviItem[
-                                              'isFavorite']); // حفظ الحالة الجديدة
+                                          movieKey, moviItem['isFavorite']);
 
-                                      setState(
-                                          () {}); // إعادة بناء واجهة المستخدم
+                                      setState(() {});
                                     },
                                     icon: Icon(
                                       isFavorite
@@ -186,15 +181,13 @@ class _AllPopularState extends State<AllPopular> {
     );
   }
 
-  // قراءة حالة المفضلة من SharedPreferences
   Future<void> _loadFavoriteStatus(Map<String, dynamic> moviItem) async {
     final prefs = await SharedPreferences.getInstance();
     final movieKey = 'favorite_${moviItem['title']}';
     bool isFavorite = prefs.getBool(movieKey) ?? false;
 
     setState(() {
-      moviItem['isFavorite'] =
-          isFavorite; // تأكد من تحديث حالة المفضلة في moviItem
+      moviItem['isFavorite'] = isFavorite;
     });
   }
 }

@@ -1,3 +1,4 @@
+//*_*
 import 'package:flutter/material.dart';
 import 'package:movi/views/category_details.dart';
 
@@ -30,6 +31,8 @@ class _LanguageGinerState extends State<LanguageGiner> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -38,16 +41,11 @@ class _LanguageGinerState extends State<LanguageGiner> {
             children: [
               Row(
                 children: [
-                  // Text(
-                  //   'اختر اللغة: ',
-                  //   style: TextStyle(fontSize: 18),
-                  // ),
-                  // Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DropdownButton<String>(
                       value: selectedLanguage,
-                      hint: Text('اختر اللغة'),
+                      hint: const Text('اختر اللغة'),
                       items: languages.keys.map((langCode) {
                         return DropdownMenuItem<String>(
                           value: langCode,
@@ -61,24 +59,24 @@ class _LanguageGinerState extends State<LanguageGiner> {
                       },
                     ),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Text(
                     '  : اختر اللغة ',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(
+                        fontSize: screenWidth * .047, color: Colors.grey[700]),
                   ),
                 ],
               ),
-              SizedBox(height: 16),
-
-              // اختر النوع
+              SizedBox(height: screenHeight * .001),
               Text(
                 '  :  اختر نوع الفيلم ',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                    fontSize: screenWidth * .047, color: Colors.grey[700]),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: screenHeight * .009),
               Expanded(
                 child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: 1.5,
                     crossAxisSpacing: 10,
@@ -95,7 +93,6 @@ class _LanguageGinerState extends State<LanguageGiner> {
                           selectedGenre = genreId;
                         });
 
-                        // تحميل الأفلام مباشرة عند اختيار النوع
                         if (selectedLanguage != null && selectedGenre != null) {
                           Navigator.push(
                             context,
@@ -107,9 +104,9 @@ class _LanguageGinerState extends State<LanguageGiner> {
                             ),
                           );
                         } else {
-                          // إذا لم يتم اختيار اللغة أو النوع
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('يرجى اختيار اللغة والنوع')),
+                            const SnackBar(
+                                content: Text('يرجى اختيار اللغة والنوع')),
                           );
                         }
                       },
@@ -126,7 +123,7 @@ class _LanguageGinerState extends State<LanguageGiner> {
                             genreName,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: screenWidth * .047,
                               fontWeight: FontWeight.bold,
                               color: selectedGenre == genreId
                                   ? Colors.white
